@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Auto News Bot</title>
 </head>
 <body>
@@ -13,6 +13,7 @@
     const channelUsername = '@sskylline'; // Your Telegram channel
     const proxy = 'https://api.allorigins.win/get?url=';
 
+    // Original feeds + Arabic feeds combined
     const rssFeeds = [
       'http://feeds.bbci.co.uk/news/rss.xml',
       'https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml',
@@ -23,8 +24,41 @@
       'https://feeds.skynews.com/feeds/rss/world.xml',
       'https://www.cbc.ca/cmlink/rss-topstories',
       'https://abcnews.go.com/abcnews/topstories',
-      'https://www.reutersagency.com/feed/?best-topics=top-news'
-      // ➕ Add more feeds if needed
+      'https://www.reutersagency.com/feed/?best-topics=top-news',
+
+      // Arabic feeds
+      'https://www.aljazeera.net/aljazeera/rss/all.xml',
+      'https://www.alarabiya.net/.mrss/ar.xml',
+      'https://www.alhurra.com/rss/ar.xml',
+      'https://www.skynewsarabia.com/webservices/rss',
+      'https://www.almasryalyoum.com/rss',
+      'https://www.alwatanvoice.com/rss/ar.xml',
+      'https://www.masrawy.com/rss',
+      'https://www.elbalad.news/feeds/news.xml',
+      'https://www.akhbarak.net/rss/arabic-news',
+      'https://www.dostor.org/rss',
+      'https://www.youm7.com/rss/section/3',
+      'https://www.albawabhnews.com/rss',
+      'https://www.almasdarnews.com/feed/',
+      'https://www.akhbaralaan.net/rss',
+      'https://www.elwatannews.com/rss',
+      'https://www.alriyadh.com/rss',
+      'https://www.alarabnews.com/rss',
+      'https://www.alarabnews.com/rss/latest',
+      'https://www.alarabnews.com/rss/politics',
+      'https://www.alarabnews.com/rss/sports',
+      'https://www.alarabnews.com/rss/economy',
+      'https://www.alarabnews.com/rss/technology',
+      'https://www.alarabnews.com/rss/arts',
+      'https://www.alarabnews.com/rss/opinion',
+      'https://www.alaraby.co.uk/rss',
+      'https://www.alaraby.co.uk/rss/arabic-news',
+      'https://www.alaraby.co.uk/rss/world-news',
+      'https://www.alaraby.co.uk/rss/technology',
+      'https://www.alaraby.co.uk/rss/society',
+      'https://www.alaraby.co.uk/rss/sports',
+      'https://www.alaraby.co.uk/rss/economy',
+      'https://www.alaraby.co.uk/rss/culture'
     ];
 
     const sentLinks = new Set();
@@ -70,9 +104,8 @@
       }
     }
 
-    // Run every 30 seconds
-    fetchAndSendNews(); // Run immediately once on load
-    setInterval(fetchAndSendNews, 30000); // Every 30 seconds
+    fetchAndSendNews();
+    setInterval(fetchAndSendNews, 30000);
   </script>
 </body>
 </html>
