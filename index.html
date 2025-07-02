@@ -1,51 +1,98 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8" />
-  <title>Auto News Bot</title>
+  <meta charset="UTF-8">
+  <title>Auto News Bot (Arabic Feeds)</title>
 </head>
 <body>
   <h1>Auto News Bot is Running</h1>
-  <p>Fetching and sending new articles every 60 seconds...</p>
+  <p>Fetching Arabic news feeds, one every 30 seconds, sending 2 articles per feed...</p>
 
   <script>
-    const botToken = '7519600894:AAHSl5O6MsLh4sVyDPX0tLRRXkIAGabXPTY'; // replace safely
-    const channelUsername = '@sskylline'; // replace with your channel username
+    const botToken = '7519600894:AAHSl5O6MsLh4sVyDPX0tLRRXkIAGabXPTY';
+    const channelUsername = '@sskylline';
     const proxy = 'https://api.allorigins.win/get?url=';
 
-    // Reduced set of feeds for testing (avoid 50+ at once)
-    const rssFeeds = [
+    const arabicFeeds = [
       'https://www.akhbarak.net/rss/arabic-news',
+      'https://www.akhbaralaan.net/rss',
       'https://www.alriyadh.com/rss',
-      'https://www.aljazeera.net/aljazeera/rss/all.xml'
+      'https://www.alarabiya.net/arabic/rss',
+      'https://www.almasryalyoum.com/feed/',
+      'https://www.elwatannews.com/rss',
+      'https://www.aljazeera.net/aljazeera/rss/all.xml',
+      'https://www.skynewsarabia.com/webservices/rss',
+      'https://www.albayan.ae/rss/home.xml',
+      'https://www.emaratalyoum.com/rss.xml',
+      'https://www.alwatanvoice.com/rss',
+      'https://www.alghad.com/rss',
+      'https://www.masrawy.com/rss',
+      'https://www.alayam.com/rss',
+      'https://www.alquds.co.uk/rss',
+      'https://www.alittihad.ae/rss',
+      'https://www.albawaba.com/rss-feed/news',
+      'https://www.alarabnews.com/rss',
+      'https://www.alyaum.com/rss',
+      'https://www.alqabas.com/rss',
+      'https://www.alhadath.net/rss',
+      'https://www.aljazeera.net/aljazeera/rss/politics.xml',
+      'https://www.alriyadh.com/rss/economy.xml',
+      'https://www.alarabiya.net/rss/economy.xml',
+      'https://www.alaraby.co.uk/rss',
+      'https://www.akhbarak.net/rss/sports',
+      'https://www.akhbarak.net/rss/politics',
+      'https://www.akhbarak.net/rss/economy',
+      'https://www.akhbarak.net/rss/technology',
+      'https://www.akhbarak.net/rss/opinion',
+      'https://www.alkhaleej.ae/rss',
+      'https://www.alarab.news/rss',
+      'https://www.alwafd.org/rss',
+      'https://www.albawabhnews.com/rss',
+      'https://www.aljazeera.net/aljazeera/rss/technology.xml',
+      'https://www.aljazeera.net/aljazeera/rss/economy.xml',
+      'https://www.sawtbeirut.com/rss',
+      'https://www.middleeastmonitor.com/feed/',
+      'https://www.moroccoworldnews.com/feed',
+      'https://www.arabnews.com/rss',
+      'https://www.thenationalnews.com/rss',
+      'https://www.al-monitor.com/rss',
+      'https://www.khaleejtimes.com/rss',
+      'https://www.akhbarak.net/rss/arts',
+      'https://www.akhbarak.net/rss/accidents',
+      'https://www.akhbarak.net/rss/local',
+      'https://www.akhbarak.net/rss/world',
+      'https://www.akhbarak.net/rss/funny',
+      'https://www.akhbarak.net/rss/culture',
+      'https://www.akhbarak.net/rss/religion'
     ];
 
     const sentLinks = new Set();
 
+    async function delay(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
     async function fetchFeed(feedUrl) {
       try {
         const response = await fetch(proxy + encodeURIComponent(feedUrl));
-        if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const data = await response.json();
-        if (!data.contents) throw new Error('No contents in proxy response');
-
+        if (!data.contents) throw new Error('Empty response');
         const xml = new DOMParser().parseFromString(data.contents, 'text/xml');
         return Array.from(xml.querySelectorAll('item')).map(item => ({
-          title: item.querySelector('title')?.textContent || 'No title',
-          link: item.querySelector('link')?.textContent || ''
+          title: item.querySelector('title')?.textContent,
+          link: item.querySelector('link')?.textContent
         }));
-      } catch (error) {
-        console.error(`Error fetching feed ${feedUrl}:`, error.message);
+      } catch (err) {
+        console.warn(`Feed error (${feedUrl}):`, err.message);
         return [];
       }
     }
 
     async function sendToTelegram(title, link) {
-      if (!link) return;
-      const message = `📰 <b>${title}</b>\n<a href="${link}">Read more</a>`;
-      const apiURL = `https://api.telegram.org/bot${botToken}/sendMessage`;
+      const message = `📰 <b>${title}</b>\n<a href="${link}">اقرأ المزيد</a>`;
       try {
-        const res = await fetch(apiURL, {
+        const res = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -56,31 +103,37 @@
           })
         });
         if (!res.ok) {
-          const err = await res.json();
-          console.error('Telegram API error:', err);
+          const error = await res.json();
+          console.error('Telegram error:', error.description);
         }
-      } catch (err) {
-        console.error('Error sending message to Telegram:', err.message);
+      } catch (e) {
+        console.error('Telegram request failed:', e.message);
       }
     }
 
-    async function fetchAndSendNews() {
-      for (const feed of rssFeeds) {
+    async function processFeedsSequentially() {
+      for (const feed of arabicFeeds) {
+        console.log(`⏳ Fetching: ${feed}`);
         const items = await fetchFeed(feed);
-        for (const item of items.slice(0, 2)) { // send max 2 items per feed
+        let sent = 0;
+        for (const item of items) {
           if (item.link && !sentLinks.has(item.link)) {
             await sendToTelegram(item.title, item.link);
             sentLinks.add(item.link);
-            // slight delay between sends to avoid Telegram flood limits
-            await new Promise(r => setTimeout(r, 500));
+            sent++;
+            if (sent >= 2) break;
+            await delay(3000); // Small delay between two messages
           }
         }
+        console.log(`✅ Done: ${feed} | Sent ${sent} articles`);
+        await delay(30000); // Wait 30 seconds before next feed
       }
+      // Restart after all feeds done
+      console.log('🔁 Restarting feed cycle in 60 seconds...');
+      setTimeout(processFeedsSequentially, 60000);
     }
 
-    // Run immediately and then every 60 seconds
-    fetchAndSendNews();
-    setInterval(fetchAndSendNews, 60000);
+    processFeedsSequentially();
   </script>
 </body>
 </html>
