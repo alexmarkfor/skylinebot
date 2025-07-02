@@ -6,120 +6,81 @@
 </head>
 <body>
   <h1>Auto News Bot is Running</h1>
-  <p>Fetching and sending new articles every 30 seconds...</p>
+  <p>Fetching and sending new articles every 60 seconds...</p>
 
   <script>
-    const botToken = '7519600894:AAHSl5O6MsLh4sVyDPX0tLRRXkIAGabXPTY'; // ⚠️ Change or regenerate immediately
-    const channelUsername = '@sskylline'; // Your Telegram channel
+    const botToken = '7519600894:AAHSl5O6MsLh4sVyDPX0tLRRXkIAGabXPTY'; // replace safely
+    const channelUsername = '@sskylline'; // replace with your channel username
     const proxy = 'https://api.allorigins.win/get?url=';
 
-    // Original feeds + Arabic feeds combined
-const rssFeeds = [
-
-
-  // 50+ Arabic news RSS feeds
-  'https://www.akhbarak.net/rss/arabic-news',
-  'https://www.akhbaralaan.net/rss',
-  'https://www.alriyadh.com/rss',
-  'https://www.alarabiya.net/.mrss/en.xml',
-  'https://www.alarabiya.net/arabic/rss',
-  'https://www.almasryalyoum.com/feed/',
-  'https://www.elwatannews.com/rss',
-  'https://www.aljazeera.net/aljazeera/rss/all.xml',
-  'https://www.skynewsarabia.com/webservices/rss',
-  'https://www.albayan.ae/rss/home.xml',
-  'https://www.emaratalyoum.com/rss.xml',
-  'https://www.thenationalnews.com/rss',
-  'https://www.alwatanvoice.com/rss',
-  'https://www.alghad.com/rss',
-  'https://www.masrawy.com/rss',
-  'https://www.alayam.com/rss',
-  'https://www.alquds.co.uk/rss',
-  'https://www.alittihad.ae/rss',
-  'https://www.albawaba.com/rss-feed/news',
-  'https://www.alarabnews.com/rss',
-  'https://www.alyaum.com/rss',
-  'https://www.alayam.com/rss/news.xml',
-  'https://www.alqabas.com/rss',
-  'https://www.alhadath.net/rss',
-  'https://www.aljazeera.net/aljazeera/rss/sports.xml',
-  'https://www.alriyadh.com/rss/sports.xml',
-  'https://www.alriyadh.com/rss/economy.xml',
-  'https://www.alriyadh.com/rss/politics.xml',
-  'https://www.alarabiya.net/rss/sports.xml',
-  'https://www.alarabiya.net/rss/economy.xml',
-  'https://www.alarabiya.net/rss/politics.xml',
-  'https://www.alaraby.co.uk/rss',
-  'https://www.akhbarak.net/rss/sports',
-  'https://www.akhbarak.net/rss/politics',
-  'https://www.akhbarak.net/rss/economy',
-  'https://www.akhbarak.net/rss/technology',
-  'https://www.akhbarak.net/rss/opinion',
-  'https://www.alkhaleej.ae/rss',
-  'https://www.alarab.news/rss',
-  'https://www.alkhabar.com/rss',
-  'https://www.alaraby.co.uk/rss/news',
-  'https://www.alwafd.org/rss',
-  'https://www.albawabhnews.com/rss',
-  'https://www.aljazeera.net/aljazeera/rss/technology.xml',
-  'https://www.aljazeera.net/aljazeera/rss/politics.xml',
-  'https://www.aljazeera.net/aljazeera/rss/economy.xml',
-  'https://www.alwatanvoice.com/rss',
-  'https://www.sawtbeirut.com/rss',
-  'https://www.middleeastmonitor.com/feed/',
-  'https://www.moroccoworldnews.com/feed',
-  'https://www.arabnews.com/rss',
-  'https://www.thenationalnews.com/rss',
-  'https://www.al-monitor.com/rss',
-  'https://www.huffpostarabi.com/feed',
-  'https://www.khaleejtimes.com/rss',
-];
+    // Reduced set of feeds for testing (avoid 50+ at once)
+    const rssFeeds = [
+      'https://www.akhbarak.net/rss/arabic-news',
+      'https://www.alriyadh.com/rss',
+      'https://www.aljazeera.net/aljazeera/rss/all.xml'
+    ];
 
     const sentLinks = new Set();
 
     async function fetchFeed(feedUrl) {
       try {
         const response = await fetch(proxy + encodeURIComponent(feedUrl));
+        if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
         const data = await response.json();
+        if (!data.contents) throw new Error('No contents in proxy response');
+
         const xml = new DOMParser().parseFromString(data.contents, 'text/xml');
         return Array.from(xml.querySelectorAll('item')).map(item => ({
-          title: item.querySelector('title')?.textContent,
-          link: item.querySelector('link')?.textContent
+          title: item.querySelector('title')?.textContent || 'No title',
+          link: item.querySelector('link')?.textContent || ''
         }));
       } catch (error) {
-        console.error('Error fetching feed:', feedUrl, error.message);
+        console.error(`Error fetching feed ${feedUrl}:`, error.message);
         return [];
       }
     }
 
     async function sendToTelegram(title, link) {
+      if (!link) return;
       const message = `📰 <b>${title}</b>\n<a href="${link}">Read more</a>`;
       const apiURL = `https://api.telegram.org/bot${botToken}/sendMessage`;
-      await fetch(apiURL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: channelUsername,
-          text: message,
-          parse_mode: 'HTML'
-        })
-      });
+      try {
+        const res = await fetch(apiURL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: channelUsername,
+            text: message,
+            parse_mode: 'HTML',
+            disable_web_page_preview: false
+          })
+        });
+        if (!res.ok) {
+          const err = await res.json();
+          console.error('Telegram API error:', err);
+        }
+      } catch (err) {
+        console.error('Error sending message to Telegram:', err.message);
+      }
     }
 
     async function fetchAndSendNews() {
       for (const feed of rssFeeds) {
         const items = await fetchFeed(feed);
-        for (const item of items.slice(0, 2)) {
+        for (const item of items.slice(0, 2)) { // send max 2 items per feed
           if (item.link && !sentLinks.has(item.link)) {
             await sendToTelegram(item.title, item.link);
             sentLinks.add(item.link);
+            // slight delay between sends to avoid Telegram flood limits
+            await new Promise(r => setTimeout(r, 500));
           }
         }
       }
     }
 
+    // Run immediately and then every 60 seconds
     fetchAndSendNews();
-    setInterval(fetchAndSendNews, 30000);
+    setInterval(fetchAndSendNews, 60000);
   </script>
 </body>
 </html>
