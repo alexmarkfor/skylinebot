@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Auto News Bot</title>
+</head>
+<body>
+  <h1>Auto News Bot is Running</h1>
+  <p>Fetching and sending new articles every 30 seconds...</p>
+
+  <script>
+    const botToken = '7519600894:AAHSl5O6MsLh4sVyDPX0tLRRXkIAGabXPTY'; // ⚠️ Change or regenerate immediately
+    const channelUsername = '@sskylline'; // Your Telegram channel
+    const proxy = 'https://api.allorigins.win/get?url=';
+
+    const rssFeeds = [
+      'http://feeds.bbci.co.uk/news/rss.xml',
+      'https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml',
+      'https://www.aljazeera.com/xml/rss/all.xml',
+      'http://rss.cnn.com/rss/edition.rss',
+      'https://feeds.npr.org/1001/rss.xml',
+      'https://www.theguardian.com/world/rss',
+      'https://feeds.skynews.com/feeds/rss/world.xml',
+      'https://www.cbc.ca/cmlink/rss-topstories',
+      'https://abcnews.go.com/abcnews/topstories',
+      'https://www.reutersagency.com/feed/?best-topics=top-news'
+      // ➕ Add more feeds if needed
+    ];
+
+    const sentLinks = new Set();
+
+    async function fetchFeed(feedUrl) {
+      try {
+        const response = await fetch(proxy + encodeURIComponent(feedUrl));
+        const data = await response.json();
+        const xml = new DOMParser().parseFromString(data.contents, 'text/xml');
+        return Array.from(xml.querySelectorAll('item')).map(item => ({
+          title: item.querySelector('title')?.textContent,
+          link: item.querySelector('link')?.textContent
+        }));
+      } catch (error) {
+        console.error('Error fetching feed:', feedUrl, error.message);
+        return [];
+      }
+    }
+
+    async function sendToTelegram(title, link) {
+      const message = `📰 <b>${title}</b>\n<a href="${link}">Read more</a>`;
+      const apiURL = `https://api.telegram.org/bot${botToken}/sendMessage`;
+      await fetch(apiURL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: channelUsername,
+          text: message,
+          parse_mode: 'HTML'
+        })
+      });
+    }
+
+    async function fetchAndSendNews() {
+      for (const feed of rssFeeds) {
+        const items = await fetchFeed(feed);
+        for (const item of items.slice(0, 2)) {
+          if (item.link && !sentLinks.has(item.link)) {
+            await sendToTelegram(item.title, item.link);
+            sentLinks.add(item.link);
+          }
+        }
+      }
+    }
+
+    // Run every 30 seconds
+    fetchAndSendNews(); // Run immediately once on load
+    setInterval(fetchAndSendNews, 30000); // Every 30 seconds
+  </script>
+</body>
+</html>
