@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flappy Cube</title>
+  <style>
+    html, body {
+      margin: 0;
+      overflow: hidden;
+      background: white;
+    }
+    canvas {
+      display: block;
+      touch-action: none; /* Prevent zoom/scroll on mobile */
+    }
+  </style>
+</head>
+<body>
+<canvas id="game"></canvas>
+
+<script>
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+let W = innerWidth;
+let H = innerHeight;
+canvas.width = W;
+canvas.height = H;
+
+// Audio context
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function playSound(type = 'jump') {
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.connect(gain).connect(audioCtx.destination);
+
+  if (type === 'jump') {
+    osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+    osc.type = 'square';
+  } else if (type === 'hit') {
+    osc.frequency.setValueAtTime(100, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+    osc.type = 'sawtooth';
+  } else if (type === 'point') {
+    osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+    osc.type = 'triangle';
+  }
+
+  osc.start();
+  osc.stop(audioCtx.currentTime + 0.2);
+}
+
+const gravity = 0.5;
+const jump = -8;
+const cube = { x: 80, y: H/2, size: 30, vy: 0 };
+const pipes = [];
+const pipeGap = 150;
+const pipeWidth = 60;
+const pipeFreq = 90;
+let frame = 0;
+let gameOver = false;
+let endWallX = null; // End wall appears after 1000 pipes
+let pipeCount = 0;   // Number of pipes created
+let passedPipes = new Set();
+
+function addPipe() {
+  const top = Math.random() * (H - pipeGap - 100);
+  pipes.push({ x: W, top, bottom: top + pipeGap });
+  pipeCount++;
+
+  // Place end wall after 1000 pipes
+  if (pipeCount === 1000) {
+    endWallX = W + 100; // Start offscreen
+  }
+}
+
+function reset() {
+  pipes.length = 0;
+  passedPipes.clear();
+  cube.y = H / 2;
+  cube.vy = 0;
+  frame = 0;
+  gameOver = false;
+  endWallX = null;
+  pipeCount = 0;
+  animate();
+}
+
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+
+  // Player
+  ctx.fillStyle = 'black';
+  ctx.fillRect(cube.x, cube.y, cube.size, cube.size);
+
+  // Pipes
+  ctx.fillStyle = 'black';
+  for (let pipe of pipes) {
+    ctx.fillRect(pipe.x, 0, pipeWidth, pipe.top);
+    ctx.fillRect(pipe.x, pipe.bottom, pipeWidth, H - pipe.bottom);
+  }
+
+  // Draw end wall if it exists
+  if (endWallX !== null) {
+    ctx.fillStyle = 'blue';
+    ctx.fillRect(endWallX, 0, 30, H);
+  }
+}
+
+function update() {
+  cube.vy += gravity;
+  cube.y += cube.vy;
+
+  if (frame % pipeFreq === 0 && (endWallX === null || endWallX - cube.x > W / 2))
+    addPipe();
+
+  for (let pipe of pipes) {
+    pipe.x -= 2;
+
+    if (!passedPipes.has(pipe) && pipe.x + pipeWidth < cube.x) {
+      passedPipes.add(pipe);
+      playSound('point');
+    }
+  }
+
+  // Move end wall only if it exists
+  if (endWallX !== null) {
+    endWallX -= 2;
+  }
+
+  // Collision detection
+  for (let pipe of pipes) {
+    if (
+      cube.x < pipe.x + pipeWidth &&
+      cube.x + cube.size > pipe.x &&
+      (cube.y < pipe.top || cube.y + cube.size > pipe.bottom)
+    ) {
+      if (!gameOver) playSound('hit');
+      gameOver = true;
+    }
+  }
+
+  if (cube.y > H || cube.y < 0) {
+    if (!gameOver) playSound('hit');
+    gameOver = true;
+  }
+
+  if (endWallX !== null && cube.x + cube.size >= endWallX) {
+    if (!gameOver) playSound('hit');
+    gameOver = true;
+  }
+}
+
+function animate() {
+  if (gameOver) {
+    ctx.font = '30px sans-serif';
+    ctx.fillStyle = 'red';
+    ctx.fillText('Game Over! Tap or press Space to restart.', 50, H/2);
+    return;
+  }
+  update();
+  draw();
+  frame++;
+  requestAnimationFrame(animate);
+}
+
+animate();
+
+window.addEventListener('resize', () => {
+  W = innerWidth;
+  H = innerHeight;
+  canvas.width = W;
+  canvas.height = H;
+});
+
+function flap() {
+  cube.vy = jump;
+  playSound('jump');
+  if (gameOver) reset();
+}
+
+function flapAndResumeAudio(e) {
+  e.preventDefault();
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume().then(() => flap());
+  } else {
+    flap();
+  }
+}
+
+window.addEventListener('keydown', (e) => {
+  if (e.code === 'Space') flapAndResumeAudio(e);
+});
+
+window.addEventListener('touchstart', flapAndResumeAudio, { passive: false });
+</script>
+</body>
+</html>
