@@ -247,7 +247,7 @@
       img.alt = p.title;
       img.classList.add('loading');
       img.onload = () => img.classList.remove('loading');
-      img.onclick = () => window.open(p.product_link, '_blank');
+      img.onclick = () => window.open(p.url, '_blank');
 
       const content = document.createElement('div');
       content.className = 'card-content';
@@ -260,9 +260,12 @@
       desc.className = 'card-desc';
       desc.textContent = p.description;
 
-      const price = document.createElement('div');
-      price.className = 'card-price';
-      price.textContent = `$${p.price}`;
+      // Price is not included in your new format, so let's omit price or you can add it if needed.
+      // If you want, add "price" in data.json and uncomment below:
+      // const price = document.createElement('div');
+      // price.className = 'card-price';
+      // price.textContent = `$${p.price}`;
+      // content.appendChild(price);
 
       const buttons = document.createElement('div');
       buttons.className = 'buttons';
@@ -270,19 +273,18 @@
       const viewBtn = document.createElement('button');
       viewBtn.className = 'view-btn';
       viewBtn.textContent = 'View';
-      viewBtn.onclick = () => window.open(p.product_link, '_blank');
+      viewBtn.onclick = () => window.open(p.url, '_blank');
 
       const buyBtn = document.createElement('button');
       buyBtn.className = 'buy-btn';
       buyBtn.textContent = 'Buy';
-      buyBtn.onclick = () => window.open(p.buy_link, '_blank');
+      buyBtn.onclick = () => window.open(p.url, '_blank');
 
       buttons.appendChild(viewBtn);
       buttons.appendChild(buyBtn);
 
       content.appendChild(title);
       content.appendChild(desc);
-      content.appendChild(price);
       content.appendChild(buttons);
 
       card.appendChild(img);
@@ -296,7 +298,8 @@
     const q = e.target.value.toLowerCase().trim();
     const filtered = allProducts.filter(p =>
       p.title.toLowerCase().includes(q) ||
-      p.description.toLowerCase().includes(q)
+      p.description.toLowerCase().includes(q) ||
+      p.category.toLowerCase().includes(q)
     );
     render(filtered);
   });
