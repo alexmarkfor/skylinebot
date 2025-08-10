@@ -1,0 +1,52 @@
+[
+  {
+    "id": 1,
+    "title": "Smartphone X Pro",
+    "description": "Flagship smartphone with OLED display, 5G connectivity, and triple-lens camera system.",
+    "image": "https://images.unsplash.com/photo-1510552776732-01accd4d7e24?w=800&h=600&fit=crop",
+    "price": 899,
+    "category": "electronics",
+    "link": "https://example.com/product/smartphone-x-pro",
+    "rating": 4.8
+  },
+  {
+    "id": 2,
+    "title": "Noise-Cancelling Headphones",
+    "description": "Over-ear wireless headphones with premium sound and active noise cancellation.",
+    "image": "https://images.unsplash.com/photo-1580894732444-8ecded7900cd?w=800&h=600&fit=crop",
+    "price": 249,
+    "category": "electronics",
+    "link": "https://example.com/product/noise-cancelling-headphones",
+    "rating": 4.6
+  },
+  {
+    "id": 3,
+    "title": "Lounge Chair Classic",
+    "description": "Ergonomic lounge chair with leather upholstery and walnut base.",
+    "image": "https://images.unsplash.com/photo-1549187774-b4e9b0445b06?w=800&h=600&fit=crop",
+    "price": 499,
+    "category": "home",
+    "link": "https://example.com/product/lounge-chair-classic",
+    "rating": 4.7
+  },
+  {
+    "id": 4,
+    "title": "Minimalist Wristwatch",
+    "description": "Sleek stainless steel watch with minimalist design and sapphire glass.",
+    "image": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&h=600&fit=crop",
+    "price": 199,
+    "category": "fashion",
+    "link": "https://example.com/product/minimalist-wristwatch",
+    "rating": 4.5
+  },
+  {
+    "id": 5,
+    "title": "Espresso Machine Deluxe",
+    "description": "High-pressure espresso machine with steam wand and smart temperature control.",
+    "image": "https://images.unsplash.com/photo-1556740738-b6a63e27c4df?w=800&h=600&fit=crop",
+    "price": 699,
+    "category": "home",
+    "link": "https://example.com/product/espresso-machine-deluxe",
+    "rating": 4.9
+  }
+]
