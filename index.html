@@ -2,344 +2,161 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Market — Modern Store</title>
-  <meta name="description" content="Sleek modern store — blue dark theme, rounded cards, products loaded from data.json" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <title>Market — Mobile iOS Style</title>
   <style>
-    /* Theme variables */
-    :root{
-      --bg:#061021;            /* deep navy */
-      --panel:#07172a;         /* slightly lighter */
-      --accent:#0a6cff;        /* bright blue */
-      --muted:#93a4bf;         /* muted text */
-      --glass: rgba(255,255,255,0.03);
-      --radius: 18px;         /* large rounded corners like russian iOS */
-      --card-radius: 20px;
+    :root {
+      --bg: #061021;
+      --panel: #07172a;
+      --accent: #0a6cff;
+      --muted: #93a4bf;
+      --radius: 20px;
       --bold: 800;
       color-scheme: dark;
     }
-
-    /* Basic reset */
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      background: linear-gradient(180deg,var(--bg) 0%, #021022 100%);
-      color: #e8f0ff;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-      padding:24px;
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: #fff;
+      -webkit-font-smoothing: antialiased;
     }
-
-    /* App frame */
-    .app{
-      max-width:1200px;
-      margin:0 auto;
-      display:grid;
-      grid-template-columns: 320px 1fr;
-      gap:20px;
-      align-items:start;
+    header {
+      position: sticky;
+      top: 0;
+      background: var(--panel);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      z-index: 10;
     }
-
-    /* Sidebar */
-    .sidebar{
-      background: linear-gradient(180deg,var(--panel), rgba(9,23,36,0.6));
+    header h1 {
+      font-size: 18px;
+      font-weight: var(--bold);
+      margin: 0;
+    }
+    .searchbar {
+      padding: 8px 12px;
+      background: rgba(255,255,255,0.05);
       border-radius: var(--radius);
-      padding:18px;
-      box-shadow: 0 6px 20px rgba(3,10,20,0.6);
-      position:sticky; top:24px; height:fit-content;
+      margin: 12px;
+      display: flex;
+      align-items: center;
     }
-    .logo{display:flex;gap:10px;align-items:center;margin-bottom:14px}
-    .logo .badge{
-      width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#3db0ff);
-      display:grid;place-items:center;font-weight:900;color:#00102a;font-size:18px;box-shadow:0 6px 18px rgba(10,108,255,0.12)
+    .searchbar input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      color: #fff;
+      font-size: 16px;
+      outline: none;
+      padding-left: 8px;
     }
-    h1{font-size:18px;margin:0;font-weight:var(--bold)}
-    p.lead{margin:6px 0 0;color:var(--muted);font-size:13px}
-
-    /* Controls */
-    .control{margin-top:14px}
-    label{display:block;font-size:12px;color:var(--muted);margin-bottom:8px}
-    .input, .select{width:100%;padding:10px 12px;border-radius:12px;background:var(--glass);border:1px solid rgba(255,255,255,0.03);color:inherit;font-weight:700}
-    .row{display:flex;gap:10px}
-    .chip{padding:8px 12px;border-radius:12px;background:transparent;border:1px solid rgba(255,255,255,0.04);font-weight:700;color:var(--muted);cursor:pointer}
-    .chip.active{background:linear-gradient(180deg, rgba(10,108,255,0.12), rgba(10,108,255,0.06));border-color:rgba(10,108,255,0.25);color:var(--accent)}
-
-    /* Main area */
-    .main{
-      background: linear-gradient(180deg, rgba(7,23,42,0.6), rgba(6,17,34,0.35));
+    main {
+      padding: 0 12px 80px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 12px;
+    }
+    .card {
+      background: var(--panel);
       border-radius: var(--radius);
-      padding:18px;
-      min-height:80vh;
-      box-shadow: 0 8px 30px rgba(2,6,12,0.6);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
     }
-    .toolbar{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:16px}
-    .searchbar{flex:1;margin-right:12px}
-    .searchbar .input{padding-left:40px;position:relative}
-    .search-icon{position:relative;left:36px;margin-right: -36px;opacity:0.8}
-
-    /* Grid */
-    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
-    .card{
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      border-radius:var(--card-radius);
-      padding:12px;overflow:hidden;border:1px solid rgba(255,255,255,0.03);
-      transition:transform .15s ease,box-shadow .15s ease;
-      display:flex;flex-direction:column;gap:10px;
+    .card img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
     }
-    .card:hover{transform:translateY(-6px);box-shadow:0 14px 30px rgba(3,10,20,0.5)}
-    .thumb{width:100%;height:150px;border-radius:12px;background:#021224;display:grid;place-items:center;overflow:hidden}
-    .thumb img{width:100%;height:100%;object-fit:cover}
-    .title{font-size:14px;font-weight:800;line-height:1.1}
-    .desc{font-size:13px;color:var(--muted);height:38px;overflow:hidden}
-    .meta{display:flex;justify-content:space-between;align-items:center;margin-top:auto}
-    .price{font-weight:900;color:var(--accent)}
-    .btn{padding:8px 12px;border-radius:12px;border:0;cursor:pointer;font-weight:800}
-    .btn.primary{background:linear-gradient(90deg,var(--accent),#3db0ff);color:#00102a}
-    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
-
-    /* Modal */
-    .modal{position:fixed;inset:0;display:grid;place-items:center;background:rgba(0,0,0,0.5);z-index:40;padding:24px;}
-    .modal-card{width:100%;max-width:920px;background:linear-gradient(180deg,#071528,#031426);border-radius:20px;padding:18px;border:1px solid rgba(255,255,255,0.04);display:grid;grid-template-columns:1fr 360px;gap:16px}
-    .modal-thumb{height:420px;border-radius:14px;overflow:hidden}
-    .modal-thumb img{width:100%;height:100%;object-fit:cover}
-    .modal-info h2{margin:0 0 6px;font-weight:900}
-    .modal-info p{color:var(--muted)}
-
-    /* Responsive */
-    @media (max-width:980px){
-      .app{grid-template-columns:1fr;}
-      .sidebar{position:relative}
-      .modal-card{grid-template-columns:1fr}
+    .card-body {
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
     }
-
-    /* small utility */
-    .muted{color:var(--muted);font-weight:700}
-    .rating{background:rgba(255,255,255,0.03);padding:6px;border-radius:10px;font-weight:800}
+    .card-title {
+      font-weight: var(--bold);
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+    .card-desc {
+      font-size: 12px;
+      color: var(--muted);
+      flex: 1;
+    }
+    .card-price {
+      font-weight: var(--bold);
+      color: var(--accent);
+      margin-top: 6px;
+    }
+    footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--panel);
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 0;
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+    footer button {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 14px;
+      font-weight: var(--bold);
+    }
   </style>
 </head>
 <body>
-  <div class="app" id="app">
-    <aside class="sidebar" aria-label="Filters and account">
-      <div class="logo">
-        <div class="badge">M</div>
-        <div>
-          <h1>Market</h1>
-          <p class="lead">Sleek marketplace • Blue dark theme</p>
-        </div>
-      </div>
-
-      <div class="control">
-        <label for="q">Search</label>
-        <input id="q" class="input" placeholder="Search products..." />
-      </div>
-
-      <div class="control">
-        <label>Categories</label>
-        <div class="row" id="cats">
-          <button class="chip active" data-cat="all">All</button>
-          <button class="chip" data-cat="electronics">Electronics</button>
-          <button class="chip" data-cat="home">Home</button>
-          <button class="chip" data-cat="fashion">Fashion</button>
-        </div>
-      </div>
-
-      <div class="control">
-        <label>Sort</label>
-        <select id="sort" class="select">
-          <option value="featured">Featured</option>
-          <option value="price-asc">Price: Low → High</option>
-          <option value="price-desc">Price: High → Low</option>
-        </select>
-      </div>
-
-      <div style="margin-top:18px;color:var(--muted);font-size:13px">Quick tips</div>
-      <ul style="margin:8px 0 0;padding-left:18px;color:var(--muted);font-size:13px">
-        <li>Click product to open details</li>
-        <li>Products are loaded from <code>data.json</code></li>
-      </ul>
-    </aside>
-
-    <main class="main">
-      <div class="toolbar">
-        <div style="display:flex;gap:12px;align-items:center;flex:1">
-          <div style="position:relative;flex:1">
-            <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" style="position:absolute;left:12px;top:8px"><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path><circle cx="11" cy="11" r="6" stroke="currentColor" stroke-width="1.6" /></svg>
-            <input id="mainSearch" class="input" placeholder="Search products, brands, models..." />
-          </div>
-          <div>
-            <button class="btn ghost" id="viewToggle">Grid</button>
-          </div>
-        </div>
-
-        <div style="display:flex;gap:10px;align-items:center">
-          <div class="muted">0 items</div>
-          <button class="btn primary">Checkout</button>
-        </div>
-      </div>
-
-      <section id="results" class="grid" aria-live="polite">
-        <!-- product cards injected here -->
-      </section>
-
-      <div id="empty" style="display:none;text-align:center;padding:36px;color:var(--muted)">No products found.</div>
-    </main>
+  <header>
+    <h1>Market</h1>
+    <button>Cart</button>
+  </header>
+  <div class="searchbar">
+    <input type="text" id="search" placeholder="Search products...">
   </div>
-
-  <!-- Modal (templated) -->
-  <div id="modalRoot" style="display:none"></div>
+  <main>
+    <div class="grid" id="productGrid"></div>
+  </main>
+  <footer>
+    <button>Home</button>
+    <button>Categories</button>
+    <button>Profile</button>
+  </footer>
 
   <script>
-    // Utilities
-    const $ = sel => document.querySelector(sel);
-    const $$ = sel => Array.from(document.querySelectorAll(sel));
-
-    // App state
-    let products = [];
-    let filtered = [];
-    let activeCat = 'all';
-
-    // Fetch products from data.json
     async function loadProducts(){
-      try{
-        const res = await fetch('data.json');
-        if(!res.ok) throw new Error('Could not load data.json');
-        products = await res.json();
-        // ensure shape: [{id,title,description,image,price,category,link}]
-        products = products.map((p,i)=>({...p,id:p.id||i}));
-        filtered = products.slice();
-        render();
-      }catch(err){
-        console.error(err);
-        document.getElementById('results').innerHTML = `<div style="grid-column:1/-1;padding:24px;color:var(--muted)">Failed loading products. Make sure <code>data.json</code> is next to <code>index.html</code>.</div>`;
-      }
+      const res = await fetch('data.json');
+      const products = await res.json();
+      render(products);
     }
-
-    // Render product grid
-    function render(){
-      const container = document.getElementById('results');
-      container.innerHTML = '';
-      const q = $('#mainSearch').value.trim().toLowerCase() || $('#q').value.trim().toLowerCase();
-      const sort = $('#sort').value;
-
-      filtered = products.filter(p=>{
-        if(activeCat !== 'all' && p.category !== activeCat) return false;
-        if(!q) return true;
-        return (p.title||'').toLowerCase().includes(q) || (p.description||'').toLowerCase().includes(q);
-      });
-
-      if(sort === 'price-asc') filtered.sort((a,b)=> (a.price||0) - (b.price||0));
-      if(sort === 'price-desc') filtered.sort((a,b)=> (b.price||0) - (a.price||0));
-
-      if(filtered.length === 0){ $('#empty').style.display='block'; return } else { $('#empty').style.display='none' }
-
-      for(const p of filtered){
-        const el = document.createElement('article');
-        el.className = 'card';
-        el.setAttribute('tabindex',0);
-        el.innerHTML = `
-          <div class="thumb" aria-hidden>
-            <img loading="lazy" src="${escapeHtml(p.image||'')||'data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"600\" height=\"400\"></svg>'}" alt="${escapeHtml(p.title||'')}">
-          </div>
-          <div>
-            <div class="title">${escapeHtml(p.title||'Untitled')}</div>
-            <div class="desc">${escapeHtml(p.description||'')}</div>
-          </div>
-          <div class="meta">
-            <div class="price">${formatPrice(p.price)}</div>
-            <div style="display:flex;gap:8px">
-              <button class="btn ghost" data-action="view" data-id="${p.id}">View</button>
-              <a class="btn primary" href="${escapeAttr(p.link||'#')}" target="_blank" rel="noopener">Buy</a>
-            </div>
+    function render(products){
+      const grid = document.getElementById('productGrid');
+      grid.innerHTML = '';
+      products.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <img src="${p.image}" alt="${p.title}">
+          <div class="card-body">
+            <div class="card-title">${p.title}</div>
+            <div class="card-desc">${p.description}</div>
+            <div class="card-price">$${p.price}</div>
           </div>
         `;
-        // open on click
-        el.addEventListener('click', (e)=>{
-          if(e.target && e.target.tagName === 'A') return; // let link work
-          openModal(p);
-        });
-        container.appendChild(el);
-      }
-      // update counts
-      document.querySelector('.muted').textContent = `${filtered.length} items`;
+        grid.appendChild(card);
+      });
     }
-
-    function openModal(p){
-      const root = document.getElementById('modalRoot');
-      root.style.display = 'block';
-      root.innerHTML = `
-        <div class="modal" role="dialog" aria-modal="true">
-          <div class="modal-card">
-            <div>
-              <div class="modal-thumb"><img src="${escapeAttr(p.image||'')}" alt="${escapeAttr(p.title||'')}"></div>
-            </div>
-            <div class="modal-info">
-              <h2>${escapeHtml(p.title||'')}</h2>
-              <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px"><div class="rating">★ ${p.rating||4.7}</div><div class="muted">• ${p.category||'General'}</div></div>
-              <p>${escapeHtml(p.description||'')}</p>
-              <div style="margin-top:18px;display:flex;gap:12px;align-items:center">
-                <div style="font-size:20px;font-weight:900" class="price">${formatPrice(p.price)}</div>
-                <a class="btn primary" href="${escapeAttr(p.link||'#')}" target="_blank" rel="noopener">Go to product</a>
-                <button class="btn ghost" id="closeModal">Close</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      `;
-      $('#closeModal').addEventListener('click', ()=>{ root.style.display='none'; root.innerHTML=''; });
-      // close modal on outside click
-      root.querySelector('.modal').addEventListener('click', (ev)=>{ if(ev.target === ev.currentTarget){ root.style.display='none'; root.innerHTML=''; } });
-    }
-
-    // helpers
-    function escapeHtml(s){ return (''+ (s||'')).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"})[c]); }
-    function escapeAttr(s){ return String(s||'').replace(/"/g,'&quot;'); }
-    function formatPrice(n){ if(!n && n!==0) return '—'; try{ return (Number(n).toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:2})) }catch(e){ return '$'+n } }
-
-    // Wire controls
-    $('#mainSearch').addEventListener('input', debounce(render,220));
-    $('#q').addEventListener('input', debounce(render,220));
-    $('#sort').addEventListener('change', render);
-    $$('#cats .chip').forEach(b=>b.addEventListener('click', (ev)=>{
-      $$('#cats .chip').forEach(x=>x.classList.remove('active'));
-      ev.currentTarget.classList.add('active');
-      activeCat = ev.currentTarget.dataset.cat;
-      render();
-    }));
-
-    // Delegated view buttons
-    document.addEventListener('click', (e)=>{
-      const v = e.target.closest('[data-action]');
-      if(!v) return;
-      const action = v.dataset.action; const id = v.dataset.id;
-      if(action === 'view'){
-        const p = products.find(x=>String(x.id) === String(id)); if(p) openModal(p);
-      }
-    });
-
-    // small debounce
-    function debounce(fn,ms=200){let t;return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms)} }
-
-    // Load app
     loadProducts();
-
-    // Accessibility: allow Enter on focused card to open
-    document.addEventListener('keydown', (e)=>{
-      if(e.key === 'Enter' && document.activeElement && document.activeElement.classList.contains('card')){
-        const id = document.activeElement.querySelector('[data-action]')?.dataset.id;
-        const p = products.find(x=>String(x.id) === String(id)); if(p) openModal(p);
-      }
-      if(e.key === 'Escape'){ const root = document.getElementById('modalRoot'); if(root && root.style.display === 'block'){ root.style.display='none'; root.innerHTML=''; }}
-    });
   </script>
-
-  <!--
-    NOTE: Create a file named `data.json` next to this index.html with an array of products like:
-    [
-      {"id":1, "title":"Smartphone X","description":"Powerful phone","image":"/images/phone.jpg","price":499,"category":"electronics","link":"https://example.com/product/1"},
-      {"id":2, "title":"Lounge Chair","description":"Comfort seat","image":"/images/chair.jpg","price":129,"category":"home","link":"https://example.com/product/2"}
-    ]
-  -->
 </body>
 </html>
