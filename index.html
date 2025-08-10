@@ -225,7 +225,7 @@
   let allProducts = [];
 
   async function loadProducts(){
-    const res = await fetch('data.json');
+    const res = await fetch('https://raw.githubusercontent.com/thewebmarketpage/thewebmarketpage.github.io/refs/heads/root/data.json');
     allProducts = await res.json();
     render(allProducts);
   }
@@ -241,7 +241,6 @@
       const card = document.createElement('div');
       card.className = 'card';
 
-      // Image with fade in
       const img = document.createElement('img');
       img.src = p.image;
       img.alt = p.title;
@@ -259,13 +258,6 @@
       const desc = document.createElement('p');
       desc.className = 'card-desc';
       desc.textContent = p.description;
-
-      // Price is not included in your new format, so let's omit price or you can add it if needed.
-      // If you want, add "price" in data.json and uncomment below:
-      // const price = document.createElement('div');
-      // price.className = 'card-price';
-      // price.textContent = `$${p.price}`;
-      // content.appendChild(price);
 
       const buttons = document.createElement('div');
       buttons.className = 'buttons';
@@ -293,7 +285,6 @@
     });
   }
 
-  // Real-time search filter
   document.getElementById('searchBar').addEventListener('input', e => {
     const q = e.target.value.toLowerCase().trim();
     const filtered = allProducts.filter(p =>
