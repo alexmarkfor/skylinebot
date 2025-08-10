@@ -49,6 +49,27 @@
       padding: 12px 12px 100px;
       background: var(--gray-light);
       overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    #searchBar {
+      position: sticky;
+      top: 0;
+      background: var(--gray-light);
+      padding: 8px 12px;
+      border-radius: 16px;
+      font-size: 17px;
+      font-weight: 400;
+      border: none;
+      outline: none;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+      user-select: text;
+      -webkit-user-select: text;
+      z-index: 11;
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
     }
     .grid {
       display: grid;
@@ -152,7 +173,7 @@
       backdrop-filter: saturate(180%) blur(18px);
       border-top: 1px solid var(--gray-border);
       display: flex;
-      justify-content: space-around;
+      justify-content: center;
       align-items: center;
       box-shadow: 0 -2px 8px rgba(0,0,0,0.06);
       user-select: none;
@@ -161,7 +182,7 @@
       background: none;
       border: none;
       font-size: 24px;
-      color: #444;
+      color: var(--blue);
       cursor: pointer;
       display: flex;
       flex-direction: column;
@@ -176,10 +197,6 @@
       margin-top: 2px;
       letter-spacing: 0.02em;
       user-select: none;
-    }
-    nav button.active,
-    nav button:hover {
-      color: var(--blue);
     }
     /* Scrollbar for iOS style */
     main::-webkit-scrollbar {
@@ -197,25 +214,29 @@
 <body>
   <header>Store</header>
   <main>
+    <input type="search" id="searchBar" placeholder="Search products..." aria-label="Search products" />
     <div class="grid" id="productGrid"></div>
   </main>
   <nav>
-    <button class="active" aria-label="Home">🏠<span>Home</span></button>
-    <button aria-label="Search">🔍<span>Search</span></button>
-    <button aria-label="Cart">🛒<span>Cart</span></button>
-    <button aria-label="Profile">👤<span>Profile</span></button>
+    <button aria-label="Home">🏠<span>Home</span></button>
   </nav>
 
 <script>
+  let allProducts = [];
+
   async function loadProducts(){
     const res = await fetch('data.json');
-    const products = await res.json();
-    render(products);
+    allProducts = await res.json();
+    render(allProducts);
   }
 
   function render(products){
     const grid = document.getElementById('productGrid');
     grid.innerHTML = '';
+    if(products.length === 0){
+      grid.innerHTML = '<p style="text-align:center;color:#888;font-size:16px;margin-top:20px;">No products found.</p>';
+      return;
+    }
     products.forEach(p => {
       const card = document.createElement('div');
       card.className = 'card';
@@ -269,6 +290,16 @@
       grid.appendChild(card);
     });
   }
+
+  // Real-time search filter
+  document.getElementById('searchBar').addEventListener('input', e => {
+    const q = e.target.value.toLowerCase().trim();
+    const filtered = allProducts.filter(p =>
+      p.title.toLowerCase().includes(q) ||
+      p.description.toLowerCase().includes(q)
+    );
+    render(filtered);
+  });
 
   loadProducts();
 </script>
